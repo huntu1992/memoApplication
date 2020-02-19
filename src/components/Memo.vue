@@ -1,9 +1,18 @@
-
 <template>
   <li class="memo-item">
-    <strong>{{memo.title}}</strong>
-    <p>{{memo.content}}</p>
-    <button type="button" @click="deleteMemo">
+    <strong>{{ memo.title }}</strong>
+    <p @dblclick="handleDbClick">
+      <template v-if="!isEditing">{{ memo.content }}</template>
+      <input
+        v-else
+        type="text"
+        ref="content"
+        :value="memo.content"
+        @blur="handleBlur"
+        @keydown.enter="updateMemo"
+      />
+    </p>
+    <button type="button" v-on:click="deleteMemo">
       <i class="fas fa-times"></i>
     </button>
   </li>
@@ -12,15 +21,39 @@
 <script>
 export default {
   name: "Memo",
+  computed: {
+    isEditing() {
+      return this.memo.id === this.editingId;
+    }
+  },
   props: {
     memo: {
       type: Object
+    },
+    editingId: {
+      type: Number
     }
   },
   methods: {
+    handleBlur() {
+      this.$emit("resetEditingId");
+    },
     deleteMemo() {
       const id = this.memo.id;
       this.$emit("deleteMemo", id);
+    },
+    handleDbClick() {
+      this.$emit("setEditingId", this.memo.id);
+      this.$nextTick(() => {
+        this.$refs.content.focus();
+      });
+    },
+    updateMemo(e) {
+      const id = this.memo.id;
+      const content = e.target.value.trim();
+      if (content.length <= 0) return false;
+      this.$emit("updateMemo", { id, content });
+      this.$refs.content.blur();
     }
   }
 };
@@ -45,7 +78,9 @@ export default {
   color: #e5e5e5;
   border: 0;
 }
-
+.memo-item button:hover {
+  color: #6e6e6e;
+}
 .memo-item strong {
   display: block;
   margin-bottom: 12px;
@@ -58,5 +93,11 @@ export default {
   font-size: 14px;
   line-height: 22px;
   color: #666;
+}
+.memo-item p input[type="text"] {
+  box-sizing: border-box;
+  width: 100%;
+  font-size: inherit;
+  border: 1px solid #999;
 }
 </style>

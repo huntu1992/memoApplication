@@ -1,6 +1,6 @@
 <template>
   <div class="memo-form">
-    <form @submit.prevent="addMemo">
+    <form v-on:submit.prevent="addMemo">
       <fieldset>
         <div>
           <input
@@ -9,7 +9,11 @@
             placeholder="메모제목을 입력해주세요"
             v-model="title"
           />
-          <textarea class="memo-form__content-form" placeholder="메모내용을 입력해주세요" v-model="content" />
+          <textarea
+            class="memo-form__content-form"
+            placeholder="메모내용을 입력해주세요"
+            v-model="content"
+          />
           <button type="reset">
             <i class="fas fa-sync-alt"></i>
           </button>
@@ -39,10 +43,11 @@ export default {
     },
     addMemo() {
       const { title, content } = this;
-      const id = new Date().getTime();
+      // const id = new Date().getTime();
       const isEmpty = title.length <= 0 || content.length <= 0;
       this.resetField();
-      return isEmpty ? false : this.$emit("addMemo", { id, title, content });
+      // return isEmpty ? false : this.$emit("addMemo", { id, title, content });
+      return isEmpty ? false : this.$emit("addMemo", { title, content });
     }
   }
 };
